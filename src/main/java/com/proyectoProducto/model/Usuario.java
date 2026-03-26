@@ -9,30 +9,18 @@ public class Usuario {
     private String email;
     private String contrasena;
     private Rol rol;
-    private byte estado;
+    private boolean activo;
     private LocalDateTime fechaCreacion;
     private LocalDateTime ultimaSesion;
+    private boolean cambiarContrasena;
 
     public enum Rol
     {
         ADMIN,
         VENDEDOR
     }
+    public Usuario() {}
 
-    public Usuario(int idUsuario,String nombre,String email,Rol rol, byte estado){
-        this.idUsuario=idUsuario;
-        this.nombre=nombre;
-        this.email=email;
-        this.rol=rol;
-        this.estado=estado;
-    }
-  public Usuario(String nombre, String email,String contrasena, Rol rol, byte estado){
-        this.nombre=nombre;
-        this.email=email;
-        this.contrasena=contrasena;
-        this.rol=rol;
-        this.estado=estado;
-    }
     public int getIdUsuario() {
         return idUsuario;
     }
@@ -73,12 +61,12 @@ public class Usuario {
         this.rol = rol;
     }
 
-    public byte getEstado() {
-        return estado;
+    public boolean getActivo() {
+        return activo;
     }
 
-    public void setEstado(byte estado) {
-        this.estado = estado;
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 
     public LocalDateTime getFechaCreacion() {
@@ -95,5 +83,13 @@ public class Usuario {
 
     public void setUltimaSesion(LocalDateTime ultimaSesion) {
         this.ultimaSesion = ultimaSesion;
+    }
+
+    public boolean getCambiarContrasena() {
+        return cambiarContrasena;
+    }
+
+    public void setCambiarContrasena(boolean cambiarContrasena) {
+        this.cambiarContrasena = cambiarContrasena;
     }
 }
