@@ -7,25 +7,9 @@ public class Producto {
     private double precio;
     private int stock;
     private int idCategoria;
-    private byte estado;
+    private boolean activo;
 
-    public Producto(int idProducto, String nombre, String descripcion, double precio, int stock, int idCategoria, byte estado) {
-        this.idProducto = idProducto;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.stock = stock;
-        this.idCategoria = idCategoria;
-        this.estado = estado;
-    }
-    public Producto(String nombre, String descripcion, double precio, int stock, int idCategoria,byte estado) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.stock = stock;
-        this.idCategoria = idCategoria;
-        this.estado = estado;
-    }
+    public Producto() {  }
 
     public int getIdProducto() {
         return idProducto;
@@ -63,10 +47,12 @@ public class Producto {
     public void setIdCategoria(int idCategoria) {
         this.idCategoria = idCategoria;
     }
-    public byte getEstado() {
-        return estado;
+    public boolean getActivo() {
+        return activo;
     }
-    public void setEstado(byte estado) {
-        this.estado = estado;
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
+
+
 }
