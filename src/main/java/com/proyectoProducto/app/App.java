@@ -1,5 +1,6 @@
 package com.proyectoProducto.app;
 
+
 import com.proyectoProducto.dao.UsuarioDAO;
 import com.proyectoProducto.model.Usuario;
 import com.proyectoProducto.service.UsuarioService;
@@ -9,7 +10,7 @@ import java.util.Scanner;
 
 public class App {
     static void main(String[] args) {
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
+      UsuarioDAO usuarioDAO = new UsuarioDAO();
         UsuarioService usuarioService = new UsuarioService(usuarioDAO);
         Scanner sc = new Scanner(System.in);
         Usuario usuarioLogueado;
@@ -39,6 +40,7 @@ public class App {
             System.out.println(e.getMessage());
         }
     }
+
     private static void menuAdmin(UsuarioService usuarioService, Usuario admin,Scanner sc){
         String CrearUsuariNombre,crearUsuarioEmail,actualizarUsuarioNombre,actualizarUsuarioEmail,buscarPorEmail;
         int opcionMenuAdmin,actualizarUsuarioId,actualizarActivoId,buscarPorId;
@@ -166,10 +168,8 @@ public class App {
                     contrasenaActualVendedor=sc.nextLine();
                     System.out.println("Ingresa contrasena nueva");
                     contrasenaNuevaVendedor=sc.nextLine();
-
-                   if(usuarioService.cambiarContrasena(vendedor,contrasenaActualVendedor,contrasenaNuevaVendedor)){
-                       System.out.println("Contrasena actualizada correctamente");
-                   }
+                   usuarioService.cambiarContrasena(vendedor,contrasenaActualVendedor,contrasenaNuevaVendedor);
+                    System.out.println("Contraseña Actualizada correctamente");
                     break;
             }
         }while(opcionMenuVendedor!=2);
@@ -240,6 +240,5 @@ public class App {
             usuarioService.cambiarContrasenaPrimerLogin(usuario,cambiarContrasenaPrimerLogin(sc));
         }
     }
-
 }
 
