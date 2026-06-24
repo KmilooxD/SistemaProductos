@@ -5,31 +5,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Venta {
-    private int id_venta;
+    private int idVenta;
     private LocalDateTime fecha;
     private BigDecimal total;
-    private int id_usuario;
-    private int id_cliente;
+    private int idUsuario;
+    private int idCliente;
+    private boolean activo;
 
-    public Venta(int id_venta, LocalDateTime fecha, BigDecimal total, int id_usuario, int id_cliente) {
-        this.id_venta = id_venta;
-        this.fecha = fecha;
-        this.total = total;
-        this.id_usuario = id_usuario;
-        this.id_cliente = id_cliente;
-    }
-    public Venta(BigDecimal total, int id_usuario, int id_cliente) {
-        this.total = total;
-        this.id_usuario = id_usuario;
-        this.id_cliente = id_cliente;
+    public Venta() {
     }
 
-    public int getId_venta() {
-        return id_venta;
+
+    public int getIdVenta() {
+        return idVenta;
     }
 
-    public void setId_venta(int id_venta) {
-        this.id_venta = id_venta;
+    public void setIdVenta(int idVenta) {
+        this.idVenta = idVenta;
     }
 
     public LocalDateTime getFecha() {
@@ -48,19 +40,25 @@ public class Venta {
         this.total = total;
     }
 
-    public int getId_usuario() {
-        return id_usuario;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setId_usuario(int id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public int getId_cliente() {
-        return id_cliente;
+    public int getIdCliente() {
+        return idCliente;
     }
 
-    public void setId_cliente(int id_cliente) {
-        this.id_cliente = id_cliente;
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
+    }
+    public boolean getActivo() {
+        return activo;
+    }
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }
