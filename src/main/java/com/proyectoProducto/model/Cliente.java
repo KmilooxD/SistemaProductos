@@ -6,22 +6,10 @@ public class Cliente {
     private String rut;
     private String email;
     private String telefono;
-    private byte activo;
+    private boolean activo;
 
-    public Cliente(int idCliente,String nombre,String rut,String email,String telefono,byte activo){
-        this.idCliente=idCliente;
-        this.nombre=nombre;
-        this.rut=rut;
-        this.email=email;
-        this.telefono=telefono;
-        this.activo=activo;
-    }
-    public Cliente(String nombre,String rut,String email,String telefono,byte activo){
-        this.nombre=nombre;
-        this.rut=rut;
-        this.email=email;
-        this.telefono=telefono;
-        this.activo=activo;
+    public Cliente(){
+
     }
 
     public int getIdCliente() {
@@ -54,10 +42,10 @@ public class Cliente {
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-    public byte getActivo() {
+    public boolean getActivo() {
         return activo;
     }
-    public void setActivo(byte activo) {
+    public void setActivo(boolean activo) {
         this.activo = activo;
     }
 }
