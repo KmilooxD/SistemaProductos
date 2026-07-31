@@ -1,9 +1,8 @@
 package com.proyectoProducto.service;
 
-import com.proyectoProducto.dao.UsuarioDAO;
+
 import com.proyectoProducto.dao.VentaDAO;
-import com.proyectoProducto.model.Usuario;
-import com.proyectoProducto.model.Venta;
+import com.proyectoProducto.model.*;
 import com.proyectoProducto.util.ValidarUsuario;
 
 import java.math.BigDecimal;
@@ -11,11 +10,22 @@ import java.util.List;
 
 public class VentaService {
     private final VentaDAO ventaDAO;
-    private final UsuarioDAO usuarioDAO;
+    private final UsuarioService usuarioService;
+    private final DetalleVentaService detalleVentaService;
+    private final ClienteService clienteService;
+    private final ProductoService productoService;
+    private static final String ENTIDAD_VENTA="venta";
+    private static final String ENTIDAD_VENDEDOR="vendedor";
+    private static final String ENTIDAD_CLIENTE="cliente";
 
-    public VentaService(VentaDAO ventaDAO, UsuarioDAO usuarioDAO) {
+
+    public VentaService(VentaDAO ventaDAO, UsuarioService usuarioService,ProductoService productoService,DetalleVentaService detalleVentaService, ClienteService clienteService ) {
         this.ventaDAO = ventaDAO;
-        this.usuarioDAO = usuarioDAO;
+        this.usuarioService = usuarioService;
+        this.productoService = productoService;
+        this.detalleVentaService = detalleVentaService;
+        this.clienteService = clienteService;
+
     }
     public List<Venta> listarVentas(){
         return ventaDAO.listarVentas();
@@ -24,35 +34,52 @@ public class VentaService {
         return ventaDAO.listarVentasActivas();
     }
     public Venta buscarPorId(int id){
-        validarId(id);
+        validarId(id,ENTIDAD_VENTA);
         return ventaDAO.buscarVentaPorId(id).orElseThrow(() -> new RuntimeException("Venta no encontrada"));
     }
     public List<Venta> buscarVentasPorCliente(int idCliente){
-        validarId(idCliente);
+        validarId(idCliente,ENTIDAD_CLIENTE);
         return ventaDAO.buscarVentasPorCliente(idCliente);
     }
     public List<Venta> buscarVentasPorVendedor(int idVendedor){
-        validarId(idVendedor);
-        usuarioDAO.buscarPorId(idVendedor).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        validarId(idVendedor,ENTIDAD_VENDEDOR);
+        usuarioService.buscarPorId(idVendedor);
         return ventaDAO.buscarVentasPorUsuario(idVendedor);
     }
 
-    public boolean crearVenta(Usuario vendedor, Venta venta){
+    public Venta crearVenta(Usuario vendedor, Venta venta, List<DetalleVenta> detallesVenta){
         ValidarUsuario.validarUsuarioActivo(vendedor);
         validarVenta(venta);
-        venta.setIdUsuario(vendedor.getIdUsuario());
-        boolean insertado =ventaDAO.insertar(venta);
-        if(!insertado){
-            throw new RuntimeException("Error al registrar la venta");
+        validarCliente(venta.getIdCliente());
+
+        if(detallesVenta==null || detallesVenta.isEmpty()){
+            throw new IllegalArgumentException("La venta debe contener al menos un detalle");
         }
-        return true;
+        for(DetalleVenta detalle : detallesVenta){
+            productoService.validarStockDisponible(detalle.getIdProducto(),detalle.getCantidad());
+        }
+
+        venta.setIdUsuario(vendedor.getIdUsuario());
+        venta.setTotal(calcularTotal(detallesVenta));
+        Venta ventaCreada=ventaDAO.insertar(venta);
+
+        for(DetalleVenta detalle : detallesVenta){
+            detalle.setIdVenta(ventaCreada.getIdVenta());
+            detalleVentaService.crearDetalleVenta(detalle);
+        }
+        for(DetalleVenta detalle : detallesVenta){
+            productoService.descontarStock(detalle.getIdProducto(),detalle.getCantidad());
+        }
+
+        return ventaCreada;
     }
+
+
     public boolean cambiarActivo(Usuario admin,int idVenta, boolean activo){
         ValidarUsuario.validarAdmin(admin);
-        validarId(idVenta);
+        validarId(idVenta,ENTIDAD_VENTA);
         ventaDAO.buscarVentaPorId(idVenta).orElseThrow(() -> new RuntimeException("Venta no encontrada"));
-        boolean actualizado=ventaDAO.cambiarActivo(idVenta,activo);
-        if(!actualizado){
+        if(!ventaDAO.cambiarActivo(idVenta,activo)){
             throw new RuntimeException("Error al actualizar el activo");
         }
         return true;
@@ -61,20 +88,31 @@ public class VentaService {
         if(venta==null){
             throw new IllegalArgumentException("Venta invalida");
         }
-        if(venta.getTotal()==null){
-            throw new IllegalArgumentException("El total es obligatorio");
-        }
-        if(venta.getTotal().compareTo(BigDecimal.ZERO)<=0){
-            throw new IllegalArgumentException("El total debe ser mayor que 0");
-        }
 
-        if (venta.getIdCliente()<=0){
-            throw new IllegalArgumentException("ID de cliente invalido");
+    }
+    private void validarId(int id, String entidad){
+        if(id<=0){
+            throw new IllegalArgumentException("Id "+entidad+" invalido");
         }
     }
-    private void validarId(int id){
-        if(id<=0){
-            throw new IllegalArgumentException("ID invalido");
+    private void validarCliente(int idCliente){
+        validarId(idCliente,ENTIDAD_CLIENTE);
+        Cliente cliente =clienteService.buscarClientePorId(idCliente);
+
+        if(!cliente.getActivo()){
+            throw new RuntimeException("Cliente inactivo");
         }
+
+    }
+    private BigDecimal calcularTotal(List<DetalleVenta> detallesVenta){
+        BigDecimal total=BigDecimal.ZERO;
+        for(DetalleVenta detalle : detallesVenta){
+           Producto producto= productoService.buscarPorId(detalle.getIdProducto());
+
+           BigDecimal subtotal= producto.getPrecio().multiply(BigDecimal.valueOf(detalle.getCantidad()));
+            total=total.add(subtotal);
+        }
+        return total;
+
     }
 }

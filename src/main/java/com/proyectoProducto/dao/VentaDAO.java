@@ -18,7 +18,7 @@ private static final String SQL_BUSCAR_VENTA_POR_ID="SELECT id_venta, fecha, tot
 private static final String SQL_BUSCAR_VENTAS_POR_CLIENTE="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta WHERE id_cliente=?";
 private static final String SQL_BUSCAR_VENTAS_POR_USUARIO="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta WHERE id_usuario=?";
 private static final String SQL_INSERTAR_VENTA="INSERT INTO venta (total,id_usuario,id_cliente) VALUES (?,?,?)";
-private static final String SQL_ACTUALIZAR_ACTIVO="UPDATE venta SET activo=? WHERE id_venta=?";
+private static final String SQL_ACTUALIZAR_ACTIVO_VENTA="UPDATE venta SET activo=? WHERE id_venta=?";
 private Venta mapearVenta(ResultSet rs) throws SQLException {
     Venta venta = new Venta();
             venta.setIdVenta(rs.getInt("id_venta"));
@@ -130,13 +130,24 @@ public List<Venta> buscarVentasPorCliente(int idCliente){
         }
         return ventasUsuario;
     }
-public boolean insertar(Venta venta){
+public Venta insertar(Venta venta){
     try(
         Connection conn= ConexionDB.getConection();
-        PreparedStatement stmt=conn.prepareStatement(SQL_INSERTAR_VENTA);
+        PreparedStatement stmt=conn.prepareStatement(SQL_INSERTAR_VENTA,java.sql.Statement.RETURN_GENERATED_KEYS);
             ){
         setVenta(stmt,venta);
-        return stmt.executeUpdate()>0;
+        if(stmt.executeUpdate()==0){
+            throw  new RuntimeException("Error al insertar la venta");
+        }
+        try(
+                ResultSet rs=stmt.getGeneratedKeys()){
+            if(rs.next()){
+                venta.setIdVenta(rs.getInt(1));
+            }else{
+                throw new RuntimeException("Error al obtener el id del venta");
+            }
+        }
+         return venta;
     }catch(SQLException e){
         throw new RuntimeException("Error al insertar venta",e);
 
@@ -145,7 +156,7 @@ public boolean insertar(Venta venta){
 public boolean cambiarActivo(int idVenta, boolean activo){
     try(
             Connection conn= ConexionDB.getConection();
-            PreparedStatement stmt=conn.prepareStatement(SQL_ACTUALIZAR_ACTIVO);
+            PreparedStatement stmt=conn.prepareStatement(SQL_ACTUALIZAR_ACTIVO_VENTA);
             ){
         stmt.setBoolean(1, activo);
         stmt.setInt(2, idVenta);
