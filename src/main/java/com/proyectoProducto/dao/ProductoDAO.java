@@ -26,7 +26,7 @@ public class ProductoDAO {
         producto.setIdProducto(rs.getInt("id_producto"));
         producto.setNombre(rs.getString("nombre"));
         producto.setDescripcion(rs.getString("descripcion"));
-        producto.setPrecio(rs.getDouble("precio"));
+        producto.setPrecio(rs.getBigDecimal("precio"));
         producto.setStock(rs.getInt("stock"));
         producto.setIdCategoria(rs.getInt("id_categoria"));
         producto.setActivo(rs.getBoolean("activo"));
@@ -36,7 +36,7 @@ public class ProductoDAO {
     private void setParametros(PreparedStatement stmt, Producto producto) throws SQLException {
         stmt.setString(1, producto.getNombre());
         stmt.setString(2, producto.getDescripcion());
-        stmt.setDouble(3, producto.getPrecio());
+        stmt.setBigDecimal(3, producto.getPrecio());
         stmt.setInt(4, producto.getStock());
         stmt.setInt(5, producto.getIdCategoria());
         stmt.setBoolean(6, producto.getActivo());
@@ -72,9 +72,19 @@ public class ProductoDAO {
         }
         return productosActivos;
     }
-    public Optional<Producto> buscarPorId(int id){
+    public Optional<Producto> buscarProductoPorId(int id){
         try (
                 Connection conn = ConexionDB.getConection();
+        ) {
+           return buscarProductoPorId(id, conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar por Id", e);
+        }
+
+    }
+    public Optional<Producto> buscarProductoPorId(int id,Connection conn){
+        try (
+
                 PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_POR_ID);
         ) {
             stmt.setInt(1, id);
@@ -157,9 +167,8 @@ public class ProductoDAO {
             throw new RuntimeException("Error al agregar stock",e);
         }
     }
-    public boolean descontarStock(int id, int stock){
+    public boolean descontarStock(int id, int stock, Connection conn){
         try(
-                Connection conn = ConexionDB.getConection();
                 PreparedStatement stmt= conn.prepareStatement(SQL_DESCONTAR_STOCK)
         ){
             stmt.setInt(1, stock);

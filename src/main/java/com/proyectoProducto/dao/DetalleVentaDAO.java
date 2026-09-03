@@ -67,9 +67,9 @@ public class DetalleVentaDAO {
         }
         return listaDetalleVentaPorVenta;
     }
-    public boolean insertarDetalleVenta(DetalleVenta detalleVenta) {
+    public boolean insertarDetalleVenta(DetalleVenta detalleVenta, Connection conn) {
         try(
-                Connection conn= ConexionDB.getConection();
+
                 PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_DETALLEVENTA);
                 ){
         setDetalleVenta(stmt,detalleVenta);

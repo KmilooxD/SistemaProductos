@@ -6,6 +6,8 @@ import com.proyectoProducto.dao.VentaDAO;
 import com.proyectoProducto.model.DetalleVenta;
 import com.proyectoProducto.model.Producto;
 import com.proyectoProducto.model.Venta;
+
+import java.sql.Connection;
 import java.util.List;
 
 
@@ -29,21 +31,21 @@ public class DetalleVentaService {
         validarId(id,DETALLE_VENTA);
         return detalleVentaDAO.listarDetalleVentaPorVenta(id);
     }
-    public boolean crearDetalleVenta(DetalleVenta detalleVenta){
+    public boolean crearDetalleVenta(DetalleVenta detalleVenta, Connection conn){
     if(detalleVenta==null){
     throw new IllegalArgumentException("El detalle de venta no puede ser null.");
     }
     validarId(detalleVenta.getIdVenta(),VENTA);
     validarId(detalleVenta.getIdProducto(),PRODUCTO);
-    Venta venta=ventaDAO.buscarVentaPorId(detalleVenta.getIdVenta()).orElseThrow(()->new IllegalArgumentException("La venta no existe"));
-    Producto producto=productoDAO.buscarPorId(detalleVenta.getIdProducto()).orElseThrow(()->new IllegalArgumentException("El producto no existe"));
+    Venta venta=ventaDAO.buscarVentaPorId(detalleVenta.getIdVenta(),conn).orElseThrow(()->new IllegalArgumentException("La venta no existe"));
+    Producto producto=productoDAO.buscarProductoPorId(detalleVenta.getIdProducto(),conn).orElseThrow(()->new IllegalArgumentException("El producto no existe"));
     validarVentaActiva(venta);
     validarProductoActivo(producto);
     if (detalleVenta.getCantidad()<=0){
         throw new IllegalArgumentException("Cantidad invalida");
     }
     detalleVenta.setPrecioUnitario(producto.getPrecio());
-    if(!detalleVentaDAO.insertarDetalleVenta(detalleVenta)){
+    if(!detalleVentaDAO.insertarDetalleVenta(detalleVenta,conn)){
         throw new RuntimeException("No se pudo insertar el detalle de venta");
     }
         return true;

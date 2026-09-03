@@ -1,10 +1,12 @@
 package com.proyectoProducto.model;
 
+import java.math.BigDecimal;
+
 public class Producto {
     private int idProducto;
     private String nombre;
     private String descripcion;
-    private double precio;
+    private BigDecimal precio;
     private int stock;
     private int idCategoria;
     private boolean activo;
@@ -29,10 +31,8 @@ public class Producto {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-    public double getPrecio() {
-        return precio;
-    }
-    public void setPrecio(double precio) {
+    public BigDecimal getPrecio() {return precio;}
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
     public int getStock() {

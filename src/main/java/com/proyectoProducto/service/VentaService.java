@@ -2,10 +2,13 @@ package com.proyectoProducto.service;
 
 
 import com.proyectoProducto.dao.VentaDAO;
+import com.proyectoProducto.db.ConexionDB;
 import com.proyectoProducto.model.*;
 import com.proyectoProducto.util.ValidarUsuario;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class VentaService {
@@ -47,33 +50,57 @@ public class VentaService {
         return ventaDAO.buscarVentasPorUsuario(idVendedor);
     }
 
-    public Venta crearVenta(Usuario vendedor, Venta venta, List<DetalleVenta> detallesVenta){
+    public Venta crearVenta(Usuario vendedor, Venta venta, List<DetalleVenta> detallesVenta) {
         ValidarUsuario.validarUsuarioActivo(vendedor);
         validarVenta(venta);
         validarCliente(venta.getIdCliente());
 
-        if(detallesVenta==null || detallesVenta.isEmpty()){
+        if (detallesVenta == null || detallesVenta.isEmpty()) {
             throw new IllegalArgumentException("La venta debe contener al menos un detalle");
         }
-        for(DetalleVenta detalle : detallesVenta){
-            productoService.validarStockDisponible(detalle.getIdProducto(),detalle.getCantidad());
+        for (DetalleVenta detalle : detallesVenta) {
+            productoService.validarStockDisponible(detalle.getIdProducto(), detalle.getCantidad());
         }
-
         venta.setIdUsuario(vendedor.getIdUsuario());
         venta.setTotal(calcularTotal(detallesVenta));
-        Venta ventaCreada=ventaDAO.insertar(venta);
+        Connection conn = null;
 
-        for(DetalleVenta detalle : detallesVenta){
-            detalle.setIdVenta(ventaCreada.getIdVenta());
-            detalleVentaService.crearDetalleVenta(detalle);
-        }
-        for(DetalleVenta detalle : detallesVenta){
-            productoService.descontarStock(detalle.getIdProducto(),detalle.getCantidad());
-        }
+        try {
+            conn=ConexionDB.getConection();
+            conn.setAutoCommit(false);
 
-        return ventaCreada;
+            Venta ventaCreada = ventaDAO.insertar(venta, conn);
+
+            for (DetalleVenta detalle : detallesVenta) {
+                detalle.setIdVenta(ventaCreada.getIdVenta());
+                detalleVentaService.crearDetalleVenta(detalle, conn);
+            }
+            for (DetalleVenta detalle : detallesVenta) {
+                productoService.descontarStock(detalle.getIdProducto(), detalle.getCantidad(), conn);
+            }
+
+            conn.commit();
+
+            return ventaCreada;
+        } catch (Exception e) {
+            if(conn!=null){
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Error al hacer rollback", ex);
+                }
+            }
+            throw new RuntimeException("Error al crear la venta",e);
+        } finally {
+            if (conn != null) {
+                try{
+                    conn.close();
+                }catch(SQLException e){
+                    throw new RuntimeException("Error al cerrar conexion", e);
+                }
+            }
+        }
     }
-
 
     public boolean cambiarActivo(Usuario admin,int idVenta, boolean activo){
         ValidarUsuario.validarAdmin(admin);

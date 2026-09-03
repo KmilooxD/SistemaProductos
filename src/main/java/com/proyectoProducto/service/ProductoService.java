@@ -5,6 +5,8 @@ import com.proyectoProducto.model.Producto;
 import com.proyectoProducto.model.Usuario;
 import com.proyectoProducto.util.ValidarUsuario;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.List;
 
 public class ProductoService {
@@ -22,7 +24,7 @@ public class ProductoService {
 
     public Producto buscarPorId(int id){
       validarIdProducto(id);
-        return productoDAO.buscarPorId(id).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        return productoDAO.buscarProductoPorId(id).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
     public Producto buscarPorNombre(String nombre){
         if(nombre==null || nombre.isBlank()){
@@ -45,7 +47,7 @@ public class ProductoService {
         ValidarUsuario.validarAdmin(admin);
         validarIdProducto(producto.getIdProducto());
         validarProducto(producto);
-        productoDAO.buscarPorId(producto.getIdProducto()).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        productoDAO.buscarProductoPorId(producto.getIdProducto()).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         boolean actualizado=productoDAO.actualizar(producto);
         if(!actualizado){
             throw new RuntimeException("Error al actualizar el producto");
@@ -55,7 +57,7 @@ public class ProductoService {
     public boolean actualizarActivo(Usuario admin,int idProducto,boolean activo){
       ValidarUsuario.validarAdmin(admin);
       validarIdProducto(idProducto);
-      productoDAO.buscarPorId(idProducto).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+      productoDAO.buscarProductoPorId(idProducto).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
       boolean actualizado=productoDAO.cambiarActivo(idProducto,activo);
       if(!actualizado){
           throw new RuntimeException("Error al actualizar el activo");
@@ -72,14 +74,9 @@ public class ProductoService {
         }
         return true;
     }
-    public boolean descontarStockPorVenta(int idProducto, int cantidad){
-        validarIdProducto(idProducto);
-        Producto producto=productoDAO.buscarPorId(idProducto).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        validarCantidad(cantidad);
-        if(producto.getStock()<cantidad){
-            throw new RuntimeException("Stock insuficiente");
-        }
-        boolean actualizado=productoDAO.descontarStock(idProducto,cantidad);
+    public boolean descontarStock(int idProducto, int cantidad, Connection conn){
+        validarStockDisponible(idProducto,cantidad);
+        boolean actualizado=productoDAO.descontarStock(idProducto,cantidad,conn);
         if(!actualizado){
             throw new RuntimeException("Error al descontar el stock");
         }
@@ -95,6 +92,16 @@ public class ProductoService {
     }
     return true;
     }
+    public void validarStockDisponible(int idProducto, int cantidad){
+        validarIdProducto(idProducto);
+        validarCantidad(cantidad);
+
+        Producto producto=productoDAO.buscarProductoPorId(idProducto).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        if(producto.getStock()<cantidad){
+            throw new RuntimeException(producto.getNombre()+" no cuenta con el stock suficiente");
+        }
+
+    }
 
 
      private void validarProducto(Producto producto){
@@ -107,7 +114,8 @@ public class ProductoService {
          if(producto.getDescripcion()==null || producto.getDescripcion().isBlank()){
              throw new IllegalArgumentException("La descripcion es obligatoria");
          }
-         if(producto.getPrecio()<=0){
+
+         if(producto.getPrecio().compareTo(BigDecimal.ZERO)<=0){
              throw new IllegalArgumentException("El precio es invalido");
          }
          if(producto.getStock()<0){
@@ -132,7 +140,7 @@ public class ProductoService {
             throw new IllegalArgumentException("Stock invalido");
         }
      }
-
+    
 
 
 }

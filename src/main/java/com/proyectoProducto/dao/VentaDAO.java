@@ -72,9 +72,17 @@ public List<Venta> listarVentasActivas(){
     }
     return ventasActivos;
 }
-public Optional<Venta> buscarVentaPorId(int id){
+    public Optional<Venta> buscarVentaPorId(int id){
+        try(
+                Connection conn= ConexionDB.getConection();
+        ){
+         return buscarVentaPorId(id,conn);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar venta por id",e);
+        }
+    }
+public Optional<Venta> buscarVentaPorId(int id,Connection conn){
     try(
-            Connection conn= ConexionDB.getConection();
             PreparedStatement stmt=conn.prepareStatement(SQL_BUSCAR_VENTA_POR_ID);
 
        ){
@@ -130,9 +138,8 @@ public List<Venta> buscarVentasPorCliente(int idCliente){
         }
         return ventasUsuario;
     }
-public Venta insertar(Venta venta){
+public Venta insertar(Venta venta, Connection conn){
     try(
-        Connection conn= ConexionDB.getConection();
         PreparedStatement stmt=conn.prepareStatement(SQL_INSERTAR_VENTA,java.sql.Statement.RETURN_GENERATED_KEYS);
             ){
         setVenta(stmt,venta);
