@@ -4,20 +4,16 @@ public class Categoria {
    private int idCategoria;
    private String nombre;
    private String descripcion;
+   private boolean activo;
 
-   public Categoria(int idCategoria, String nombre, String descripcion) {
-       this.idCategoria = idCategoria;
-       this.nombre = nombre;
-       this.descripcion = descripcion;
+   public Categoria() {
+
    }
-    public Categoria(String nombre, String descripcion) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-    }
+
    public int getIdCategoria(){
        return this.idCategoria;
    }
-   public void setIdCAtegoria(int idCategoria){
+   public void setIdCategoria(int idCategoria){
        this.idCategoria = idCategoria;
    }
    public String getNombre(){
@@ -32,4 +28,11 @@ public class Categoria {
    public void setDescripcion(String descripcion){
        this.descripcion = descripcion;
    }
+    public boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
 }
