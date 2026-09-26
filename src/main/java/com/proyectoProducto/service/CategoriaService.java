@@ -23,6 +23,13 @@ public class CategoriaService {
      validarId(id,"categoria");
       return categoriaDAO.buscarCategoriaPorId(id).orElseThrow(() -> new RuntimeException("Categoria no encontrada"));
   }
+  public Categoria buscarCategoriaPorNombre(String nombre){
+      if(nombre==null || nombre.isBlank()){
+          throw new IllegalArgumentException("El nombre es obligatorio");
+      }
+      nombre=FormatearTexto.formatearNombre(nombre);
+      return categoriaDAO.buscarCategoriaPorNombre(nombre).orElseThrow(() -> new RuntimeException("Nombre de la categoria no encontrada"));
+  }
   public Categoria ingresarCategoria(Usuario admin, Categoria categoria){
       ValidarUsuario.validarAdmin(admin);
       validarCategoria(categoria);
@@ -53,10 +60,10 @@ public class CategoriaService {
       if(categoria==null){
           throw new IllegalArgumentException("La categoria es obligatoria");
       }
-      categoria.setNombre(FormatearTexto.formatearNombre(categoria.getNombre()));
       if (categoria.getNombre()==null ||categoria.getNombre().isBlank()){
           throw new IllegalArgumentException("El Nombre es obligatorio");
       }
+      categoria.setNombre(FormatearTexto.formatearNombre(categoria.getNombre()));
       if(categoria.getNombre().length()>100){
           throw new IllegalArgumentException("Has sobrepasado el limite de caracteres (100)");
       }
