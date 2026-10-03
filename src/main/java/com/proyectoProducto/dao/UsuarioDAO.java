@@ -10,17 +10,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class UsuarioDAO {
-    private static final String SQL_LISTAR_USUARIO = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario";
-    private static final String SQL_LISTAR_USUARIO_ACTIVO = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario WHERE activo=1";
-    private static final String SQL_BUSCAR_POR_ID = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario WHERE id_usuario=?";
-    private static final String SQL_BUSCAR_POR_ID_LOGIN = "SELECT id_usuario, nombre, email, contrasena, rol, activo, fecha_creacion, ultima_sesion, cambiar_contrasena FROM usuario WHERE id_usuario=?";
-    private static final String SQL_BUSCAR_POR_EMAIL = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario WHERE email=?";
-    private static final String SQL_BUSCAR_POR_EMAIL_LOGIN = "SELECT id_usuario, nombre, email, contrasena, rol, activo, fecha_creacion, ultima_sesion, cambiar_contrasena FROM usuario WHERE email=?";
-    private static final String SQL_INSERTAR = "INSERT INTO usuario (nombre, email, contrasena, rol) VALUES (?,?,?,?)";
-    private static final String SQL_ACTUALIZAR = "UPDATE usuario SET nombre=?, email=?, rol=?, activo=? WHERE id_usuario=?";
-    private static final String SQL_CAMBIAR_ACTIVO = "UPDATE usuario SET activo=? WHERE id_usuario=?";
-    private static final String SQL_CAMBIAR_CONTRASENA = "UPDATE usuario SET contrasena=?, cambiar_contrasena=0 WHERE id_usuario=?";
-    private static final String SQL_ACTUALIZAR_ULTIMA_SESION = "UPDATE usuario SET ultima_sesion= NOW() WHERE id_usuario=?";
+    private static final String SQL_LISTAR_USUARIOS = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario";
+    private static final String SQL_LISTAR_USUARIOS_ACTIVOS = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario WHERE activo=1";
+    private static final String SQL_BUSCAR_USUARIO_POR_ID = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario WHERE id_usuario=?";
+    private static final String SQL_BUSCAR_USUARIO_POR_ID_LOGIN = "SELECT id_usuario, nombre, email, contrasena, rol, activo, fecha_creacion, ultima_sesion, cambiar_contrasena FROM usuario WHERE id_usuario=?";
+    private static final String SQL_BUSCAR_USUARIO_POR_EMAIL = "SELECT id_usuario, nombre, email, rol, activo, fecha_creacion, ultima_sesion FROM usuario WHERE email=?";
+    private static final String SQL_BUSCAR_USUARIO_POR_EMAIL_LOGIN = "SELECT id_usuario, nombre, email, contrasena, rol, activo, fecha_creacion, ultima_sesion, cambiar_contrasena FROM usuario WHERE email=?";
+    private static final String SQL_INSERTAR_USUARIO = "INSERT INTO usuario (nombre, email, contrasena, rol) VALUES (?, ?, ?, ?)";
+    private static final String SQL_ACTUALIZAR_USUARIO = "UPDATE usuario SET nombre=?, email=?, rol=?, activo=? WHERE id_usuario=?";
+    private static final String SQL_CAMBIAR_ACTIVO_USUARIO = "UPDATE usuario SET activo=? WHERE id_usuario=?";
+    private static final String SQL_CAMBIAR_CONTRASENA_USUARIO = "UPDATE usuario SET contrasena=?, cambiar_contrasena=0 WHERE id_usuario=?";
+    private static final String SQL_ACTUALIZAR_ULTIMA_SESION_USUARIO = "UPDATE usuario SET ultima_sesion= NOW() WHERE id_usuario=?";
 
     private Usuario mapearUsuarioCompleto(ResultSet rs) throws SQLException {
         Usuario usuario = mapearUsuarioBasico(rs);
@@ -67,7 +67,7 @@ public class UsuarioDAO {
         List<Usuario> usuarios = new ArrayList<>();
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_USUARIO);
+                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_USUARIOS);
                 ResultSet rs = stmt.executeQuery();
         ) {
             while (rs.next()) {
@@ -79,26 +79,26 @@ public class UsuarioDAO {
         return usuarios;
     }
 
-    public List<Usuario> listarUsuariosActivo() {
+    public List<Usuario> listarUsuariosActivos() {
         List<Usuario> usuariosActivos = new ArrayList<>();
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_USUARIO_ACTIVO);
+                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_USUARIOS_ACTIVOS);
                 ResultSet rs = stmt.executeQuery();
         ) {
             while (rs.next()) {
                 usuariosActivos.add(mapearUsuarioBasico(rs));
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al listar los usuarios", e);
+            throw new RuntimeException("Error al listar los usuarios activos", e);
         }
         return usuariosActivos;
     }
 
-    public Optional<Usuario> buscarPorId(int id) {
+    public Optional<Usuario> buscarUsuarioPorId(int id) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_POR_ID);
+                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_USUARIO_POR_ID);
 
         ) {
             stmt.setInt(1, id);
@@ -110,15 +110,15 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar el usuario", e);
+            throw new RuntimeException("Error al buscar usuario por id", e);
         }
         return Optional.empty();
     }
 
-    public Optional<Usuario> buscarPorIdLogin(int id) {
+    public Optional<Usuario> buscarUsuarioPorIdLogin(int id) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_POR_ID_LOGIN);
+                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_USUARIO_POR_ID_LOGIN);
 
         ) {
             stmt.setInt(1, id);
@@ -130,15 +130,15 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar el usuario", e);
+            throw new RuntimeException("Error al buscar usuario por id", e);
         }
         return Optional.empty();
     }
 
-    public Optional<Usuario> buscarPorEmail(String email) {
+    public Optional<Usuario> buscarUsuarioPorEmail(String email) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_POR_EMAIL);
+                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_USUARIO_POR_EMAIL);
         ) {
             stmt.setString(1, email);
             try (
@@ -149,15 +149,15 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar el usuario", e);
+            throw new RuntimeException("Error al buscar usuario por email", e);
         }
         return Optional.empty();
     }
 
-    public Optional<Usuario> buscarPorEmailLogin(String email) {
+    public Optional<Usuario> buscarUsuarioPorEmailLogin(String email) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_POR_EMAIL_LOGIN);
+                PreparedStatement stmt = conn.prepareStatement(SQL_BUSCAR_USUARIO_POR_EMAIL_LOGIN);
         ) {
             stmt.setString(1, email);
             try (
@@ -168,16 +168,16 @@ public class UsuarioDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar el usuario", e);
+            throw new RuntimeException("Error al buscar usuario por email", e);
 
         }
         return Optional.empty();
     }
 
-    public boolean insertar(Usuario usuario) {
+    public boolean insertarUsuario(Usuario usuario) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR)
+                PreparedStatement stmt = conn.prepareStatement(SQL_INSERTAR_USUARIO)
         ) {
             setUsuarioInsertar(stmt, usuario);
             return stmt.executeUpdate() > 0;
@@ -186,10 +186,10 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean actualizar(Usuario usuario) {
+    public boolean actualizarUsuario(Usuario usuario) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR)
+                PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_USUARIO)
         ) {
             setUsuarioActualizar(stmt, usuario);
             return stmt.executeUpdate() > 0;
@@ -198,10 +198,10 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean cambiarActivo(int id, boolean activo) {
+    public boolean cambiarActivoUsuario(int id, boolean activo) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_CAMBIAR_ACTIVO)
+                PreparedStatement stmt = conn.prepareStatement(SQL_CAMBIAR_ACTIVO_USUARIO)
         ) {
             stmt.setBoolean(1, activo);
             stmt.setInt(2, id);
@@ -211,10 +211,10 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean cambiarContrasena(int id, String contrasena) {
+    public boolean cambiarContrasenaUsuario(int id, String contrasena) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_CAMBIAR_CONTRASENA)
+                PreparedStatement stmt = conn.prepareStatement(SQL_CAMBIAR_CONTRASENA_USUARIO)
         ) {
             stmt.setString(1, contrasena);
             stmt.setInt(2, id);
@@ -224,15 +224,15 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean actualizarUltimaSesion(int id) {
+    public boolean actualizarUltimaSesionUsuario(int id) {
         try (
                 Connection conn = ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_ULTIMA_SESION)
+                PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_ULTIMA_SESION_USUARIO)
         ) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException("Error al actualizar ultima sesion del usuario", e);
+            throw new RuntimeException("Error al actualizar última sesión del usuario", e);
 
         }
 

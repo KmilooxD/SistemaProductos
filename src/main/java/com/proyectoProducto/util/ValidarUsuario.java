@@ -14,7 +14,7 @@ public class ValidarUsuario {
     public static void validarAdmin(Usuario admin){
         validarUsuarioActivo(admin);
         if(admin.getRol() != Usuario.Rol.ADMIN) {
-            throw new IllegalArgumentException("No tienes permisos para realizar esta operacion");
+            throw new IllegalArgumentException("No tienes permisos para realizar esta operación");
         }
     }
 }

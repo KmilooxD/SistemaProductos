@@ -13,6 +13,6 @@ public class ValidarEmail {
         if(email.matches("[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}")) {
             return email.toLowerCase();
         }
-        throw new IllegalArgumentException("Email invalido");
+        throw new IllegalArgumentException("Email inválido");
     }
 }

@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class CategoriaDAO {
-    private static final String SQL_LISTAR_CATEGORIAS="SELECT id_categoria,nombre,descripcion, activo FROM categoria";
-    private static final String SQL_BUSCAR_CATEGORIA_POR_ID="SELECT id_categoria,nombre,descripcion, activo FROM categoria WHERE id_categoria=?";
-    private static final String SQL_BUSCAR_CATEGORIA_POR_NOMBRE="SELECT id_categoria,nombre,descripcion, activo FROM categoria WHERE nombre=?";
-    private static final String SQL_INSERTAR_CATEGORIA="INSERT INTO categoria (nombre,descripcion) VALUES(?,?)";
-    private static final String SQL_ACTUALIZAR_CATEGORIA="UPDATE categoria SET nombre=?,descripcion=? WHERE id_categoria=?";
-    private static final String SQL_CAMBIAR_ACTIVO_CATEGORIA="UPDATE categoria SET activo=?  WHERE id_categoria=?";
+    private static final String SQL_LISTAR_CATEGORIAS= "SELECT id_categoria, nombre, descripcion, activo FROM categoria";
+    private static final String SQL_BUSCAR_CATEGORIA_POR_ID= "SELECT id_categoria, nombre, descripcion, activo FROM categoria WHERE id_categoria=?";
+    private static final String SQL_BUSCAR_CATEGORIA_POR_NOMBRE= "SELECT id_categoria, nombre, descripcion, activo FROM categoria WHERE nombre=?";
+    private static final String SQL_INSERTAR_CATEGORIA= "INSERT INTO categoria (nombre, descripcion) VALUES(?, ?)";
+    private static final String SQL_ACTUALIZAR_CATEGORIA= "UPDATE categoria SET nombre=?, descripcion=? WHERE id_categoria=?";
+    private static final String SQL_CAMBIAR_ACTIVO_CATEGORIA= "UPDATE categoria SET activo=?  WHERE id_categoria=?";
 
     private Categoria mapearCategoria(ResultSet rs) throws SQLException {
         Categoria categoria = new Categoria();
@@ -43,7 +43,7 @@ public class CategoriaDAO {
             }
 
         }catch(SQLException e){
-            throw new RuntimeException("Error al listar categorias", e);
+            throw new RuntimeException("Error al listar categorías", e);
         }
         return categoria;
     }
@@ -80,22 +80,22 @@ public class CategoriaDAO {
             }
         }
         }catch(SQLException e){
-        throw new RuntimeException("Error al buscar categoria por nombre", e);
+        throw new RuntimeException("Error al buscar categoría por nombre", e);
         }
     return Optional.empty();
     }
-    public Categoria agregarCategoria(Categoria categoria){
+    public Categoria insertarCategoria(Categoria categoria){
         try(
             Connection conn=ConexionDB.getConection();
             PreparedStatement stmt=conn.prepareStatement(SQL_INSERTAR_CATEGORIA)
         ){
             setCategoria(stmt, categoria);
             if(stmt.executeUpdate()==0){
-                throw  new RuntimeException("Error al insertar la categoria");
+                throw  new RuntimeException("Error al insertar la categoría");
             }
             return categoria;
         }catch(SQLException e){
-            throw new RuntimeException("Error al insertar categoria", e);
+            throw new RuntimeException("Error al insertar categoría", e);
         }
     }
     public Categoria actualizarCategoria(Categoria categoria){
@@ -106,12 +106,12 @@ public class CategoriaDAO {
             setCategoria(stmt, categoria);
             stmt.setInt(3,categoria.getIdCategoria());
             if(stmt.executeUpdate()==0){
-                throw  new RuntimeException("Error al actualizar la categoria");
+                throw  new RuntimeException("Error al actualizar la categoría");
             }
             return categoria;
 
         }catch(SQLException e){
-         throw new RuntimeException("Error al actualizar categoria", e);
+         throw new RuntimeException("Error al actualizar categoría", e);
         }
     }
     public boolean actualizarActivoCategoria(int id, boolean activo){

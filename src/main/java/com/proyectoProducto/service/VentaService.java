@@ -36,21 +36,21 @@ public class VentaService {
     public List<Venta> listarVentasActivas(){
         return ventaDAO.listarVentasActivas();
     }
-    public Venta buscarPorId(int id){
-        validarId(id,ENTIDAD_VENTA);
+    public Venta buscarVentaPorId(int id){
+        validarIdVenta(id,ENTIDAD_VENTA);
         return ventaDAO.buscarVentaPorId(id).orElseThrow(() -> new RuntimeException("Venta no encontrada"));
     }
     public List<Venta> buscarVentasPorCliente(int idCliente){
-        validarId(idCliente,ENTIDAD_CLIENTE);
+        validarIdVenta(idCliente,ENTIDAD_CLIENTE);
         return ventaDAO.buscarVentasPorCliente(idCliente);
     }
     public List<Venta> buscarVentasPorVendedor(int idVendedor){
-        validarId(idVendedor,ENTIDAD_VENDEDOR);
-        usuarioService.buscarPorId(idVendedor);
+        validarIdVenta(idVendedor,ENTIDAD_VENDEDOR);
+        usuarioService.buscarUsuarioPorId(idVendedor);
         return ventaDAO.buscarVentasPorUsuario(idVendedor);
     }
 
-    public Venta crearVenta(Usuario vendedor, Venta venta, List<DetalleVenta> detallesVenta) {
+    public Venta ingresarVenta(Usuario vendedor, Venta venta, List<DetalleVenta> detallesVenta) {
         ValidarUsuario.validarUsuarioActivo(vendedor);
         validarVenta(venta);
         validarCliente(venta.getIdCliente());
@@ -59,24 +59,24 @@ public class VentaService {
             throw new IllegalArgumentException("La venta debe contener al menos un detalle");
         }
         for (DetalleVenta detalle : detallesVenta) {
-            productoService.validarStockDisponible(detalle.getIdProducto(), detalle.getCantidad());
+            productoService.validarStockDisponibleProducto(detalle.getIdProducto(), detalle.getCantidad());
         }
         venta.setIdUsuario(vendedor.getIdUsuario());
-        venta.setTotal(calcularTotal(detallesVenta));
+        venta.setTotal(calcularTotalVenta(detallesVenta));
         Connection conn = null;
 
         try {
             conn=ConexionDB.getConection();
             conn.setAutoCommit(false);
 
-            Venta ventaCreada = ventaDAO.insertar(venta, conn);
+            Venta ventaCreada = ventaDAO.insertarVenta(venta, conn);
 
             for (DetalleVenta detalle : detallesVenta) {
                 detalle.setIdVenta(ventaCreada.getIdVenta());
-                detalleVentaService.crearDetalleVenta(detalle, conn);
+                detalleVentaService.ingresarDetalleVenta(detalle, conn);
             }
             for (DetalleVenta detalle : detallesVenta) {
-                productoService.descontarStock(detalle.getIdProducto(), detalle.getCantidad(), conn);
+                productoService.descontarStockProducto(detalle.getIdProducto(), detalle.getCantidad(), conn);
             }
 
             conn.commit();
@@ -102,28 +102,28 @@ public class VentaService {
         }
     }
 
-    public boolean cambiarActivo(Usuario admin,int idVenta, boolean activo){
+    public boolean cambiarActivoVenta(Usuario admin,int idVenta, boolean activo){
         ValidarUsuario.validarAdmin(admin);
-        validarId(idVenta,ENTIDAD_VENTA);
+        validarIdVenta(idVenta,ENTIDAD_VENTA);
         ventaDAO.buscarVentaPorId(idVenta).orElseThrow(() -> new RuntimeException("Venta no encontrada"));
-        if(!ventaDAO.cambiarActivo(idVenta,activo)){
+        if(!ventaDAO.cambiarActivoVenta(idVenta,activo)){
             throw new RuntimeException("Error al actualizar el activo");
         }
         return true;
     }
     private void validarVenta(Venta venta){
         if(venta==null){
-            throw new IllegalArgumentException("Venta invalida");
+            throw new IllegalArgumentException("Venta inválida");
         }
 
     }
-    private void validarId(int id, String entidad){
+    private void validarIdVenta(int id, String entidad){
         if(id<=0){
-            throw new IllegalArgumentException("Id "+entidad+" invalido");
+            throw new IllegalArgumentException("Id "+entidad+" inválido");
         }
     }
     private void validarCliente(int idCliente){
-        validarId(idCliente,ENTIDAD_CLIENTE);
+        validarIdVenta(idCliente,ENTIDAD_CLIENTE);
         Cliente cliente =clienteService.buscarClientePorId(idCliente);
 
         if(!cliente.getActivo()){
@@ -131,10 +131,10 @@ public class VentaService {
         }
 
     }
-    private BigDecimal calcularTotal(List<DetalleVenta> detallesVenta){
+    private BigDecimal calcularTotalVenta(List<DetalleVenta> detallesVenta){
         BigDecimal total=BigDecimal.ZERO;
         for(DetalleVenta detalle : detallesVenta){
-           Producto producto= productoService.buscarPorId(detalle.getIdProducto());
+           Producto producto= productoService.buscarProductoPorId(detalle.getIdProducto());
 
            BigDecimal subtotal= producto.getPrecio().multiply(BigDecimal.valueOf(detalle.getCantidad()));
             total=total.add(subtotal);

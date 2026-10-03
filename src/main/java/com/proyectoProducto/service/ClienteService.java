@@ -20,7 +20,7 @@ public class ClienteService {
         return clienteDAO.listarClientesActivos();
     }
     public Cliente buscarClientePorId(int id){
-       validarId(id);
+       validarIdCliente(id);
         return clienteDAO.buscarClientePorId(id).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
     }
     public Cliente buscarClientePorRut(String rut){
@@ -31,9 +31,9 @@ public class ClienteService {
         email=ValidarEmail.validarYFormatearEmail(email);
         return clienteDAO.buscarClientePorEmail(email).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
     }
-    public Cliente crearCliente(Usuario usuario, Cliente nuevoCliente){
+    public Cliente ingresarCliente(Usuario usuario, Cliente nuevoCliente){
         ValidarUsuario.validarUsuarioActivo(usuario);
-        formatearCampos(nuevoCliente);
+        formatearCamposCliente(nuevoCliente);
         validarCliente(nuevoCliente);
         if(clienteDAO.buscarClientePorRut(nuevoCliente.getRut()).isPresent()){
             throw new IllegalStateException("El rut ya se encuentra registrado");
@@ -49,8 +49,8 @@ public class ClienteService {
     }
     public boolean actualizarCliente(Usuario usuario, Cliente cliente){
         ValidarUsuario.validarUsuarioActivo(usuario);
-        validarId(cliente.getIdCliente());
-        formatearCampos(cliente);
+        validarIdCliente(cliente.getIdCliente());
+        formatearCamposCliente(cliente);
         validarCliente(cliente);
         clienteDAO.buscarClientePorId(cliente.getIdCliente()).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
         Cliente clienteRut=clienteDAO.buscarClientePorRut(cliente.getRut()).orElse(null);
@@ -67,12 +67,12 @@ public class ClienteService {
         }
         return true;
     }
-    public boolean actualizarActivo(Usuario admin,int id, boolean activo){
+    public boolean actualizarActivoCliente(Usuario admin,int id, boolean activo){
         ValidarUsuario.validarAdmin(admin);
-        validarId(id);
+        validarIdCliente(id);
         clienteDAO.buscarClientePorId(id).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
         if(!clienteDAO.actualizarActivo(id,activo)){
-            throw new RuntimeException("Error al actualizar el cliente");
+            throw new RuntimeException("Error al actualizar el activo");
         }
         return true;
     }
@@ -90,27 +90,27 @@ public class ClienteService {
             throw new IllegalArgumentException("El email es obligatorio");
         }
         if(cliente.getTelefono()==null || cliente.getTelefono().isBlank()){
-            throw new IllegalArgumentException("El telefono es obligatorio");
+            throw new IllegalArgumentException("El teléfono es obligatorio");
         }
         if(cliente.getRut().length()>12){
-            throw new IllegalArgumentException("El rut ha superado el maximo de caracteres (12)");
+            throw new IllegalArgumentException("El rut ha superado el máximo de caracteres (12)");
         }
         if(cliente.getNombre().length()>50){
-            throw new IllegalArgumentException("El nombre ha superado el maximo de caracteres (50)");
+            throw new IllegalArgumentException("El nombre ha superado el máximo de caracteres (50)");
         }
         if(cliente.getEmail().length()>100){
-            throw new IllegalArgumentException("El email ha superado el maximo de caracteres (100)");
+            throw new IllegalArgumentException("El email ha superado el máximo de caracteres (100)");
         }
         if(cliente.getTelefono().length()>12){
-            throw new IllegalArgumentException("El telefono ha superado el maximo de caracteres (12)");
+            throw new IllegalArgumentException("El telefono ha superado el máximo de caracteres (12)");
         }
     }
-    private void validarId(int id){
+    private void validarIdCliente(int id){
         if(id<=0){
-            throw new IllegalArgumentException("Id invalido");
+            throw new IllegalArgumentException("Id inválido");
         }
     }
-    private void formatearCampos(Cliente cliente){
+    private void formatearCamposCliente(Cliente cliente){
         if(cliente==null){
             throw new IllegalArgumentException("El cliente es obligatorio");
         }
