@@ -3,7 +3,7 @@ package com.proyectoProducto.util;
 public class ValidarTelefono {
     public static String limpiarTelefono(String telefono){
         if(telefono==null){
-            throw new IllegalArgumentException("El telefono es obligatorio");
+            throw new IllegalArgumentException("El teléfono es obligatorio");
         }
         return telefono.replaceAll(" ", "");
     }
@@ -16,6 +16,6 @@ public class ValidarTelefono {
        if(telefono.matches("\\+56\\d{9}")) {
            return telefono;
        }
-       throw new IllegalArgumentException("Telefono invalido");
+       throw new IllegalArgumentException("Teléfono inválido");
     }
 }

@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class ClienteDAO {
-    private static final String SQL_LISTAR_CLIENTES="SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente";
-    private static final String SQL_LISTAR_CLIENTES_ACTIVOS="SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE activo=1";
-    private static final String SQL_BUSCAR_CLIENTE_POR_ID="SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE id_cliente=?";
-    private static final String SQL_BUSCAR_CLIENTE_POR_RUT="SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE rut=?";
-    private static final String SQL_BUSCAR_CLIENTE_POR_EMAIL="SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE email=?";
-    private static final String SQL_INSERTAR_CLIENTE="INSERT INTO cliente (nombre, rut, email, telefono, activo) VALUES(?,?,?,?,?)";
-    private static final String SQL_ACTUALIZAR_CLIENTE="UPDATE cliente SET nombre=?,rut=?,email=?,telefono=? WHERE id_cliente=?";
-    private static final String SQL_CAMBIAR_ACTIVO="UPDATE cliente SET activo=? WHERE id_cliente=?";
+    private static final String SQL_LISTAR_CLIENTES= "SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente";
+    private static final String SQL_LISTAR_CLIENTES_ACTIVOS= "SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE activo=1";
+    private static final String SQL_BUSCAR_CLIENTE_POR_ID= "SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE id_cliente=?";
+    private static final String SQL_BUSCAR_CLIENTE_POR_RUT= "SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE rut=?";
+    private static final String SQL_BUSCAR_CLIENTE_POR_EMAIL= "SELECT id_cliente, nombre, rut, email, telefono, activo FROM cliente WHERE email=?";
+    private static final String SQL_INSERTAR_CLIENTE= "INSERT INTO cliente (nombre, rut, email, telefono, activo) VALUES(?, ?, ?, ?, ?)";
+    private static final String SQL_ACTUALIZAR_CLIENTE= "UPDATE cliente SET nombre=?,rut=?,email=?,telefono=? WHERE id_cliente=?";
+    private static final String SQL_CAMBIAR_ACTIVO= "UPDATE cliente SET activo=? WHERE id_cliente=?";
     private Cliente mapearCliente(ResultSet rs) throws SQLException {
       Cliente cliente = new Cliente();
       cliente.setIdCliente(rs.getInt("id_cliente"));

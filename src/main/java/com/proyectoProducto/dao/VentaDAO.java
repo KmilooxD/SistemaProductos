@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class VentaDAO {
-private static final String SQL_LISTAR_VENTA="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta";
+private static final String SQL_LISTAR_VENTAS="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta";
 private static final String SQL_LISTAR_VENTAS_ACTIVAS="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta WHERE activo=1";
 private static final String SQL_BUSCAR_VENTA_POR_ID="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta WHERE id_venta=?";
 private static final String SQL_BUSCAR_VENTAS_POR_CLIENTE="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta WHERE id_cliente=?";
 private static final String SQL_BUSCAR_VENTAS_POR_USUARIO="SELECT id_venta, fecha, total, id_usuario, id_cliente, activo FROM venta WHERE id_usuario=?";
-private static final String SQL_INSERTAR_VENTA="INSERT INTO venta (total,id_usuario,id_cliente) VALUES (?,?,?)";
+private static final String SQL_INSERTAR_VENTA="INSERT INTO venta (total, id_usuario, id_cliente) VALUES (?, ?, ?)";
 private static final String SQL_ACTUALIZAR_ACTIVO_VENTA="UPDATE venta SET activo=? WHERE id_venta=?";
 private Venta mapearVenta(ResultSet rs) throws SQLException {
     Venta venta = new Venta();
@@ -38,7 +38,7 @@ public List<Venta> listarVentas(){
     List<Venta> ventas = new ArrayList<>();
     try(
             Connection conn= ConexionDB.getConection();
-            PreparedStatement stmt=conn.prepareStatement(SQL_LISTAR_VENTA);
+            PreparedStatement stmt=conn.prepareStatement(SQL_LISTAR_VENTAS);
             ){
         try(
                 ResultSet rs=stmt.executeQuery();
@@ -68,7 +68,7 @@ public List<Venta> listarVentasActivas(){
                 }
             }
     }catch (SQLException e){
-        throw new RuntimeException("Error al listar ventas",e);
+        throw new RuntimeException("Error al listar ventas activas",e);
     }
     return ventasActivos;
 }
@@ -138,7 +138,7 @@ public List<Venta> buscarVentasPorCliente(int idCliente){
         }
         return ventasUsuario;
     }
-public Venta insertar(Venta venta, Connection conn){
+public Venta insertarVenta(Venta venta, Connection conn){
     try(
         PreparedStatement stmt=conn.prepareStatement(SQL_INSERTAR_VENTA,java.sql.Statement.RETURN_GENERATED_KEYS);
             ){
@@ -160,7 +160,7 @@ public Venta insertar(Venta venta, Connection conn){
 
     }
 }
-public boolean cambiarActivo(int idVenta, boolean activo){
+public boolean cambiarActivoVenta(int idVenta, boolean activo){
     try(
             Connection conn= ConexionDB.getConection();
             PreparedStatement stmt=conn.prepareStatement(SQL_ACTUALIZAR_ACTIVO_VENTA);

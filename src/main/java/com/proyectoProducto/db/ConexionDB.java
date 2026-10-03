@@ -9,7 +9,7 @@ public class ConexionDB {
     public static Connection getConection(){
         try(InputStream input = ConexionDB.class.getClassLoader().getResourceAsStream("db.properties");) {
             if(input == null){
-                    throw new RuntimeException("No se encontro db.properties");
+                    throw new RuntimeException("No se encontró db.properties");
             }
         Properties prop = new Properties();
         prop.load(input);

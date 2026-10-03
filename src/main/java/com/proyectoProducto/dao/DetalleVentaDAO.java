@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class DetalleVentaDAO {
-    private static final String SQL_LISTAR_DETALLEVENTA="SELECT id_detalleVenta,id_venta,id_producto,cantidad,precio_unitario FROM detalle_venta";
-    private static final String SQL_LISTAR_DETALLEVENTA_POR_VENTA="SELECT id_detalleVenta,id_venta,id_producto,cantidad,precio_unitario FROM detalle_venta WHERE id_venta=?";
-    private static final String SQL_INSERTAR_DETALLEVENTA="INSERT INTO detalle_venta (id_venta,id_producto,cantidad,precio_unitario) VALUES (?,?,?,?)";
+    private static final String SQL_LISTAR_DETALLEVENTAS= "SELECT id_detalleVenta, id_venta, id_producto, cantidad, precio_unitario FROM detalle_venta";
+    private static final String SQL_LISTAR_DETALLEVENTAS_POR_VENTA= "SELECT id_detalleVenta, id_venta, id_producto, cantidad, precio_unitario FROM detalle_venta WHERE id_venta=?";
+    private static final String SQL_INSERTAR_DETALLEVENTA= "INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
     private DetalleVenta mapearDetalleVenta(ResultSet rs) throws SQLException {
         DetalleVenta detalleVenta = new DetalleVenta();
         detalleVenta.setIdDetalleVenta(rs.getInt("id_detalleVenta"));
@@ -30,11 +30,11 @@ public class DetalleVentaDAO {
                 stmt.setInt(3,detalleVenta.getCantidad());
                 stmt.setBigDecimal(4,detalleVenta.getPrecioUnitario());
     }
-    public List<DetalleVenta> listarDetalleVenta() {
+    public List<DetalleVenta> listarDetalleVentas() {
         List<DetalleVenta> lista = new ArrayList<>();
         try(
                 Connection conn= ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_DETALLEVENTA);
+                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_DETALLEVENTAS);
                 ){
             try(
                     ResultSet rs = stmt.executeQuery()
@@ -44,15 +44,15 @@ public class DetalleVentaDAO {
                 }
             }
         }catch(SQLException e){
-        throw new RuntimeException("Error al listar detalle venta",e);
+        throw new RuntimeException("Error al listar detalles de venta",e);
         }
         return lista;
     }
-    public List<DetalleVenta> listarDetalleVentaPorVenta(int id_venta) {
+    public List<DetalleVenta> listarDetalleVentasPorVenta(int id_venta) {
         List<DetalleVenta> listaDetalleVentaPorVenta = new ArrayList<>();
         try(
                 Connection conn= ConexionDB.getConection();
-                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_DETALLEVENTA_POR_VENTA);
+                PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_DETALLEVENTAS_POR_VENTA);
         ){
             stmt.setInt(1,id_venta);
             try(
@@ -63,7 +63,7 @@ public class DetalleVentaDAO {
                 }
             }
         }catch(SQLException e){
-            throw new RuntimeException("Error al listar detalle venta",e);
+            throw new RuntimeException("Error al listar detalles de venta",e);
         }
         return listaDetalleVentaPorVenta;
     }
@@ -75,7 +75,7 @@ public class DetalleVentaDAO {
         setDetalleVenta(stmt,detalleVenta);
         return  stmt.executeUpdate()>0;
         }catch(SQLException e){
-            throw new RuntimeException("Error al insertar detalle venta",e);
+            throw new RuntimeException("Error al insertar detalles de venta",e);
         }
     }
 }

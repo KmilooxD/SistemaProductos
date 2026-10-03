@@ -17,7 +17,7 @@ public class ValidarRut {
     public static String rutFormateado(String rut){
         rut=limpiarRut(rut);
         if(!formatoValido(rut)){
-            throw new IllegalArgumentException("Formato de RUT invalido");
+            throw new IllegalArgumentException("Formato de RUT inválido");
         }
 
         String[] partes=rut.split("-");
@@ -36,7 +36,7 @@ public class ValidarRut {
     public static void rutValidado(String rut){
         rut=limpiarRut(rut);
         if (!formatoValido(rut)) {
-            throw new IllegalArgumentException("Formato de RUT invalido");
+            throw new IllegalArgumentException("Formato de RUT inválido");
         }
         int indexGuion=rut.indexOf("-");
         String numero=rut.substring(0,indexGuion);

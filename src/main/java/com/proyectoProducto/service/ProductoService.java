@@ -19,26 +19,27 @@ public class ProductoService {
         return productoDAO.listarProductos();
     }
     public List<Producto> listarProductosActivo(){
-        return productoDAO.listarProdctosActivo();
+        return productoDAO.listarProdctosActivos();
     }
 
-    public Producto buscarPorId(int id){
+    public Producto buscarProductoPorId(int id){
       validarIdProducto(id);
         return productoDAO.buscarProductoPorId(id).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
-    public Producto buscarPorNombre(String nombre){
+    public Producto buscarProductoPorNombre(String nombre){
         if(nombre==null || nombre.isBlank()){
-            throw new IllegalArgumentException("El nombre es obligatorio");
+            throw new IllegalArgumentException("El nombre del producto es obligatorio");
         }
-        return productoDAO.buscarPorNombre(nombre).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        return productoDAO.buscarProductoPorNombre(nombre).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
 
-    public Producto crearProducto(Usuario admin, Producto productoNuevo){
+    public Producto ingresarProducto(Usuario admin, Producto productoNuevo){
         ValidarUsuario.validarAdmin(admin);
         validarProducto(productoNuevo);
         productoNuevo.setActivo(true);
 
-        if(!productoDAO.insertar(productoNuevo)){
+
+        if(!productoDAO.insertarProducto(productoNuevo)){
             throw new RuntimeException("Error al insertar el producto");
         }
         return productoNuevo;
@@ -48,53 +49,53 @@ public class ProductoService {
         validarIdProducto(producto.getIdProducto());
         validarProducto(producto);
         productoDAO.buscarProductoPorId(producto.getIdProducto()).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        boolean actualizado=productoDAO.actualizar(producto);
+        boolean actualizado=productoDAO.actualizarProducto(producto);
         if(!actualizado){
             throw new RuntimeException("Error al actualizar el producto");
         }
         return true;
     }
-    public boolean actualizarActivo(Usuario admin,int idProducto,boolean activo){
+    public boolean actualizarActivoProducto(Usuario admin,int idProducto,boolean activo){
       ValidarUsuario.validarAdmin(admin);
       validarIdProducto(idProducto);
       productoDAO.buscarProductoPorId(idProducto).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-      boolean actualizado=productoDAO.cambiarActivo(idProducto,activo);
+      boolean actualizado=productoDAO.actualizarActivoProducto(idProducto,activo);
       if(!actualizado){
           throw new RuntimeException("Error al actualizar el activo");
       }
       return true;
     }
-    public boolean agregarStock(Usuario admin,int idProducto,int cantidad){
+    public boolean agregarStockProducto(Usuario admin,int idProducto,int cantidad){
         ValidarUsuario.validarAdmin(admin);
         validarIdProducto(idProducto);
-        validarCantidad(cantidad);
-        boolean actualizado=productoDAO.agregarStock(idProducto,cantidad);
+        validarCantidadProducto(cantidad);
+        boolean actualizado=productoDAO.agregarStockProducto(idProducto,cantidad);
         if(!actualizado){
             throw new RuntimeException("Producto no encontrado");
         }
         return true;
     }
-    public boolean descontarStock(int idProducto, int cantidad, Connection conn){
-        validarStockDisponible(idProducto,cantidad);
-        boolean actualizado=productoDAO.descontarStock(idProducto,cantidad,conn);
+    public boolean descontarStockProducto(int idProducto, int cantidad, Connection conn){
+        validarStockDisponibleProducto(idProducto,cantidad);
+        boolean actualizado=productoDAO.descontarStockProducto(idProducto,cantidad,conn);
         if(!actualizado){
             throw new RuntimeException("Error al descontar el stock");
         }
         return true;
     }
-    public boolean actualizarStock(Usuario admin,int idProducto,int nuevoStock){
+    public boolean actualizarStockProducto(Usuario admin,int idProducto,int nuevoStock){
     ValidarUsuario.validarAdmin(admin);
     validarIdProducto(idProducto);
-    validarStock(nuevoStock);
-    boolean actualizado=productoDAO.actualizarStock(idProducto,nuevoStock);
+    validarStockProducto(nuevoStock);
+    boolean actualizado=productoDAO.actualizarStockProducto(idProducto,nuevoStock);
     if(!actualizado){
         throw new RuntimeException("Producto no encontrado");
     }
     return true;
     }
-    public void validarStockDisponible(int idProducto, int cantidad){
+    public void validarStockDisponibleProducto(int idProducto, int cantidad){
         validarIdProducto(idProducto);
-        validarCantidad(cantidad);
+        validarCantidadProducto(cantidad);
 
         Producto producto=productoDAO.buscarProductoPorId(idProducto).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         if(producto.getStock()<cantidad){
@@ -106,38 +107,38 @@ public class ProductoService {
 
      private void validarProducto(Producto producto){
          if(producto==null){
-             throw new IllegalArgumentException("Producto invalido");
+             throw new IllegalArgumentException("Producto inválido");
          }
          if(producto.getNombre()==null || producto.getNombre().isBlank()){
              throw new IllegalArgumentException("El nombre es obligatorio");
          }
          if(producto.getDescripcion()==null || producto.getDescripcion().isBlank()){
-             throw new IllegalArgumentException("La descripcion es obligatoria");
+             throw new IllegalArgumentException("La descripción es obligatoria");
          }
 
          if(producto.getPrecio().compareTo(BigDecimal.ZERO)<=0){
-             throw new IllegalArgumentException("El precio es invalido");
+             throw new IllegalArgumentException("El precio es inválido");
          }
          if(producto.getStock()<0){
-             throw new IllegalArgumentException("El stock es invalido");
+             throw new IllegalArgumentException("El stock es inválido");
          }
          if(producto.getIdCategoria()<=0){
-             throw new IllegalArgumentException("La categoria es invalida");
+             throw new IllegalArgumentException("La categoria es inválida");
          }                                                  
      }
      private void validarIdProducto(int idProducto){
          if(idProducto<=0){
-             throw new IllegalArgumentException("Id invalido");
+             throw new IllegalArgumentException("Id inválido");
          }
      }
-     private void validarCantidad(int cantidad){
+     private void validarCantidadProducto(int cantidad){
          if(cantidad<=0){
-             throw new IllegalArgumentException("Cantidad invalida");
+             throw new IllegalArgumentException("Cantidad inválida");
          }
      }
-     private void validarStock(int stock){
+     private void validarStockProducto(int stock){
         if(stock<0){
-            throw new IllegalArgumentException("Stock invalido");
+            throw new IllegalArgumentException("Stock inválido");
         }
      }
     

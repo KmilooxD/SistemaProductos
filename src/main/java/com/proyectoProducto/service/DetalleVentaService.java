@@ -24,25 +24,25 @@ public class DetalleVentaService {
         this.productoDAO = productoDAO;
     }
 
-    public List<DetalleVenta> listarDetalleVentas() {
-        return detalleVentaDAO.listarDetalleVenta();
+    public List<DetalleVenta> listarDetallesVentas() {
+        return detalleVentaDAO.listarDetalleVentas();
         }
-    public List<DetalleVenta> listarDetalleVentasPorVenta(int id) {
-        validarId(id,DETALLE_VENTA);
-        return detalleVentaDAO.listarDetalleVentaPorVenta(id);
+    public List<DetalleVenta> listarDetallesVentasPorVenta(int id) {
+        validarIdDetalleVenta(id,DETALLE_VENTA);
+        return detalleVentaDAO.listarDetalleVentasPorVenta(id);
     }
-    public boolean crearDetalleVenta(DetalleVenta detalleVenta, Connection conn){
+    public boolean ingresarDetalleVenta(DetalleVenta detalleVenta, Connection conn){
     if(detalleVenta==null){
     throw new IllegalArgumentException("El detalle de venta no puede ser null.");
     }
-    validarId(detalleVenta.getIdVenta(),VENTA);
-    validarId(detalleVenta.getIdProducto(),PRODUCTO);
+    validarIdDetalleVenta(detalleVenta.getIdVenta(),VENTA);
+    validarIdDetalleVenta(detalleVenta.getIdProducto(),PRODUCTO);
     Venta venta=ventaDAO.buscarVentaPorId(detalleVenta.getIdVenta(),conn).orElseThrow(()->new IllegalArgumentException("La venta no existe"));
     Producto producto=productoDAO.buscarProductoPorId(detalleVenta.getIdProducto(),conn).orElseThrow(()->new IllegalArgumentException("El producto no existe"));
     validarVentaActiva(venta);
     validarProductoActivo(producto);
     if (detalleVenta.getCantidad()<=0){
-        throw new IllegalArgumentException("Cantidad invalida");
+        throw new IllegalArgumentException("Cantidad inválida");
     }
     detalleVenta.setPrecioUnitario(producto.getPrecio());
     if(!detalleVentaDAO.insertarDetalleVenta(detalleVenta,conn)){
@@ -51,9 +51,9 @@ public class DetalleVentaService {
         return true;
     }
 
-    private void validarId(int id, String entidad){
+    private void validarIdDetalleVenta(int id, String entidad){
         if(id<=0){
-            throw new IllegalArgumentException("Id "+entidad+" invalido");
+            throw new IllegalArgumentException("Id "+entidad+" inválido");
         }
     }
     private void validarProductoActivo(Producto producto){
